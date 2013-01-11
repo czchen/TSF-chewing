@@ -16,6 +16,8 @@
 #ifndef TEXTSERVICE_H
 #define TEXTSERVICE_H
 
+#include "chewing.h"
+
 class CLangBarItemButton;
 class CCandidateList;
 
@@ -144,6 +146,8 @@ private:
     CCandidateList *_pCandidateList;
 
     LONG _cRef;     // COM ref count
+
+    ChewingContext *mChewingContext;
 };
 
 

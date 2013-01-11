@@ -54,7 +54,7 @@ HRESULT CTextService::CreateInstance(IUnknown *pUnkOuter, REFIID riid, void **pp
 //----------------------------------------------------------------------------
 
 CTextService::CTextService()
-{
+:mChewingContext(NULL){
     DllAddRef();
 
     //
@@ -189,6 +189,11 @@ STDAPI CTextService::Activate(ITfThreadMgr *pThreadMgr, TfClientId tfClientId)
     _pThreadMgr->AddRef();
     _tfClientId = tfClientId;
 
+    assert(mChewingContext == NULL);
+    mChewingContext = chewing_new();
+    if (mChewingContext == NULL)
+        goto ExitError;
+
     //
     // Initialize ThreadMgrEventSink.
     //
@@ -277,6 +282,10 @@ STDAPI CTextService::Deactivate()
     // Uninitialize PreservedKeys
     //
     _UninitPreservedKey();
+
+    assert(mChewingContext);
+    chewing_delete(mChewingContext);
+    mChewingContext = NULL;
 
     // release ALL refs to _pThreadMgr in Deactivate
     if (_pThreadMgr != NULL)

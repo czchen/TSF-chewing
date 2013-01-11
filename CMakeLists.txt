@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.8)
 
 project(TSF-chewing)
 add_subdirectory(libchewing)
+include_directories(libchewing/include)
 
 set(SRC ${PROJECT_SOURCE_DIR}/src)
 
@@ -39,10 +40,5 @@ add_library(ChewingService SHARED
         ${SRC}/TextService.ico
         ${SRC}/TextService.rc
 )
-set_target_properties(ChewingService PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR}
-        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${PROJECT_BINARY_DIR}
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}
-        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${PROJECT_BINARY_DIR}
-)
-
+# How to link to target in subproject?
+target_link_libraries(ChewingService chewing_static)
