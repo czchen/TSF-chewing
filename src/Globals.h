@@ -25,7 +25,7 @@
 void DllAddRef();
 void DllRelease();
 
-#define ARRAYSIZE(a) (sizeof(a)/sizeof(a[0]))
+template<typename T, size_t N> size_t ArrayLength(T (&array)[N]) { return N; }
 
 #define TEXTSERVICE_LANGID    MAKELANGID(LANG_CHINESE_TRADITIONAL, SUBLANG_CHINESE_TRADITIONAL)
 
@@ -35,23 +35,6 @@ void DllRelease();
 
 #define TEXTSERVICE_ICON_INDEX  0
 #define LANGBAR_ITEM_DESC   L"Sample Text Service Button"
-
-//+---------------------------------------------------------------------------
-//
-// SafeStringCopy
-//
-// Copies a string from one buffer to another.  wcsncpy does not always
-// null-terminate the destination buffer; this function does.
-//----------------------------------------------------------------------------
-
-inline void SafeStringCopy(WCHAR *pchDst, ULONG cchMax, const WCHAR *pchSrc)
-{
-    if (cchMax > 0)
-    {
-        wcsncpy(pchDst, pchSrc, cchMax);
-        pchDst[cchMax-1] = '\0';
-    }
-}
 
 extern HINSTANCE g_hInst;
 

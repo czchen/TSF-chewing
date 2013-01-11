@@ -191,7 +191,7 @@ void BuildGlobalObjects(void)
 void FreeGlobalObjects(void)
 {
     // Free CClassFactory Objects
-    for (int i = 0; i < ARRAYSIZE(g_ObjectInfo); i++)
+    for (size_t i = 0; i < ArrayLength(g_ObjectInfo); i++)
     {
         if (NULL != g_ObjectInfo[i])
         {
@@ -225,7 +225,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, void **ppvObj)
     if (IsEqualIID(riid, IID_IClassFactory) ||
         IsEqualIID(riid, IID_IUnknown))
     {
-        for (int i = 0; i < ARRAYSIZE(g_ObjectInfo); i++)
+        for (size_t i = 0; i < ArrayLength(g_ObjectInfo); i++)
         {
             if (NULL != g_ObjectInfo[i] &&
                 IsEqualGUID(rclsid, g_ObjectInfo[i]->_rclsid))

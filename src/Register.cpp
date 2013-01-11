@@ -50,9 +50,9 @@ BOOL RegisterProfiles()
     if (hr != S_OK)
         goto Exit;
 
-    cchA = GetModuleFileNameA(g_hInst, achFileNameA, ARRAYSIZE(achFileNameA));
+    cchA = GetModuleFileNameA(g_hInst, achFileNameA, ArrayLength(achFileNameA));
 
-    cchIconFile = MultiByteToWideChar(CP_ACP, 0, achFileNameA, cchA, achIconFile, ARRAYSIZE(achIconFile)-1);
+    cchIconFile = MultiByteToWideChar(CP_ACP, 0, achFileNameA, cchA, achIconFile, ArrayLength(achIconFile)-1);
     achIconFile[cchIconFile] = '\0';
 
     hr = pInputProcessProfiles->AddLanguageProfile(c_clsidTextService,
@@ -212,7 +212,7 @@ LONG RecurseDeleteKey(HKEY hParentKey, LPCTSTR lpszKey)
     LONG lRes;
     FILETIME time;
     TCHAR szBuffer[256];
-    DWORD dwSize = ARRAYSIZE(szBuffer);
+    DWORD dwSize = ArrayLength(szBuffer);
 
     if (RegOpenKey(hParentKey, lpszKey, &hKey) != ERROR_SUCCESS)
         return ERROR_SUCCESS; // assume it couldn't be opened because it's not there
@@ -224,7 +224,7 @@ LONG RecurseDeleteKey(HKEY hParentKey, LPCTSTR lpszKey)
         lRes = RecurseDeleteKey(hKey, szBuffer);
         if (lRes != ERROR_SUCCESS)
             break;
-        dwSize = ARRAYSIZE(szBuffer);
+        dwSize = ArrayLength(szBuffer);
     }
     RegCloseKey(hKey);
 
@@ -246,7 +246,7 @@ BOOL RegisterServer()
     TCHAR achIMEKey[ARRAYSIZE(c_szInfoKeyPrefix) + CLSID_STRLEN];
     TCHAR achFileName[MAX_PATH];
 
-    if (!CLSIDToStringA(c_clsidTextService, achIMEKey + ARRAYSIZE(c_szInfoKeyPrefix) - 1))
+    if (!CLSIDToStringA(c_clsidTextService, achIMEKey + ArrayLength(c_szInfoKeyPrefix) - 1))
         return FALSE;
     memcpy(achIMEKey, c_szInfoKeyPrefix, sizeof(c_szInfoKeyPrefix)-sizeof(TCHAR));
 
@@ -259,7 +259,7 @@ BOOL RegisterServer()
         if (fRet &= RegCreateKeyEx(hKey, c_szInProcSvr32, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hSubKey, &dw)
             == ERROR_SUCCESS)
         {
-            dw = GetModuleFileNameA(g_hInst, achFileName, ARRAYSIZE(achFileName));
+            dw = GetModuleFileNameA(g_hInst, achFileName, ArrayLength(achFileName));
 
             fRet &= RegSetValueEx(hSubKey, NULL, 0, REG_SZ, (BYTE *)achFileName, (lstrlen(achFileName)+1)*sizeof(TCHAR)) == ERROR_SUCCESS;
             fRet &= RegSetValueEx(hSubKey, c_szModelName, 0, REG_SZ, (BYTE *)TEXTSERVICE_MODEL, (lstrlen(TEXTSERVICE_MODEL)+1)*sizeof(TCHAR)) == ERROR_SUCCESS;
@@ -281,7 +281,7 @@ void UnregisterServer()
 {
     TCHAR achIMEKey[ARRAYSIZE(c_szInfoKeyPrefix) + CLSID_STRLEN];
 
-    if (!CLSIDToStringA(c_clsidTextService, achIMEKey + ARRAYSIZE(c_szInfoKeyPrefix) - 1))
+    if (!CLSIDToStringA(c_clsidTextService, achIMEKey + ArrayLength(c_szInfoKeyPrefix) - 1))
         return;
     memcpy(achIMEKey, c_szInfoKeyPrefix, sizeof(c_szInfoKeyPrefix)-sizeof(TCHAR));
 

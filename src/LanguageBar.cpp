@@ -96,7 +96,7 @@ CLangBarItemButton::CLangBarItemButton(CTextService *pTextService)
     _tfLangBarItemInfo.guidItem = c_guidLangBarItemButton;   // GUID of this LangBarItem.
     _tfLangBarItemInfo.dwStyle = TF_LBI_STYLE_BTN_MENU;      // This LangBar is a button type with a menu.
     _tfLangBarItemInfo.ulSort = 0;                           // The position of this LangBar Item is not specified.
-    SafeStringCopy(_tfLangBarItemInfo.szDescription, ARRAYSIZE(_tfLangBarItemInfo.szDescription), LANGBAR_ITEM_DESC);                        // Set the description of this LangBar Item.
+    wcscpy_s(_tfLangBarItemInfo.szDescription, ArrayLength(_tfLangBarItemInfo.szDescription), LANGBAR_ITEM_DESC);                    // Set the description of this LangBar Item.
 
     // Initialize the sink pointer to NULL.
     _pLangBarItemSink = NULL;
