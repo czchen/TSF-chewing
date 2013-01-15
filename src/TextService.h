@@ -85,10 +85,6 @@ public:
     void _SetComposition(ITfComposition *pComposition);
 
     // key event handlers.
-    HRESULT _HandleCharacterKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam);
-    HRESULT _HandleArrowKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam);
-    HRESULT _HandleReturnKey(TfEditCookie ec, ITfContext *pContext);
-    HRESULT _HandleSpaceKey(TfEditCookie ec, ITfContext *pContext);
     HRESULT _HandleKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam);
     HRESULT _InvokeKeyHandler(ITfContext *pContext, WPARAM wParam, LPARAM lParam);
 
