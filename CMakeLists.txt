@@ -4,6 +4,9 @@ project(TSF-chewing)
 add_subdirectory(libchewing)
 include_directories(libchewing/include)
 
+# http://www.utf8everywhere.org/
+add_definitions(/D_UNICODE=1)
+
 set(SRC ${PROJECT_SOURCE_DIR}/src)
 
 add_library(ChewingService SHARED
