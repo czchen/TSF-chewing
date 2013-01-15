@@ -15,6 +15,7 @@ add_library(ChewingService SHARED
         ${SRC}/Globals.h
         ${SRC}/Resource.h
         ${SRC}/TextService.h
+        ${SRC}/Util.h
         ${SRC}/CandidateList.cpp
         ${SRC}/CandidateWindow.cpp
         ${SRC}/Compartment.cpp
@@ -39,6 +40,7 @@ add_library(ChewingService SHARED
         ${SRC}/TextService.def
         ${SRC}/TextService.ico
         ${SRC}/TextService.rc
+        ${SRC}/Util.cpp
 )
 # How to link to target in subproject?
 target_link_libraries(ChewingService chewing_static)
