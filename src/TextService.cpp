@@ -193,6 +193,7 @@ STDAPI CTextService::Activate(ITfThreadMgr *pThreadMgr, TfClientId tfClientId)
     mChewingContext = chewing_new();
     if (mChewingContext == NULL)
         goto ExitError;
+    chewing_set_maxChiSymbolLen(mChewingContext, 50);
 
     //
     // Initialize ThreadMgrEventSink.

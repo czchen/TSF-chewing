@@ -80,22 +80,7 @@ BOOL CTextService::_IsKeyEaten(ITfContext *pContext, WPARAM wParam)
         return FALSE;
     }
 
-    // eat only keys that CKeyHandlerEditSession can hadles.
-    switch (wParam)
-    {
-        case VK_LEFT:
-        case VK_RIGHT:
-        case VK_RETURN:
-        case VK_SPACE:
-            if (_IsComposing())
-                return TRUE;
-            return FALSE;
-    }
-
-    if (wParam >= 'A' && wParam <= 'Z')
-        return TRUE;
-
-    return FALSE;
+    return TRUE;
 }
 
 

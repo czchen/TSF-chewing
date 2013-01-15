@@ -27,6 +27,7 @@ BOOL IsRangeCovered(TfEditCookie ec, ITfRange *pRangeTest, ITfRange *pRangeCover
 
 STDAPI CTextService::OnEndEdit(ITfContext *pContext, TfEditCookie ecReadOnly, ITfEditRecord *pEditRecord)
 {
+    // FIXME: Modify this.
     BOOL fSelectionChanged;
     IEnumTfRanges *pEnumTextChanges;
     ITfRange *pRange;
