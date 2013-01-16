@@ -86,17 +86,6 @@ HRESULT CTextService::_HandleKey(TfEditCookie ec, ITfContext *pContext, WPARAM w
 //    WCHAR ch;
     BOOL fCovered;
 
-    if (_IsComposing()) {
-        /*
-         * FIXME: Cursor might be moved by mouse, so we need to adjust it.
-         */
-
-        /*
-         * FIXME: Erase original Composition. We will create a new one.
-         */
-        _TerminateComposition(ec, pContext);
-    }
-
     /*
      * FIXME: the following keys are not handled:
      * shift left
@@ -166,17 +155,47 @@ HRESULT CTextService::_HandleKey(TfEditCookie ec, ITfContext *pContext, WPARAM w
 
     int hasCommit = chewing_commit_Check(mChewingContext);
     if (hasCommit) {
-        // FIXME: Implement this
-        ChewingString commitString(chewing_commit_String(mChewingContext));
     }
 
     /*
      * Composition is mapped to preedit buffer + zuin buffer
      */
-    int hasPreedit = chewing_buffer_Check(mChewingContext);
-    int hasZuin = !chewing_zuin_Check(mChewingContext);
-    if (hasPreedit || hasZuin) {
-        _StartComposition(pContext);
+    ChewingString preedit_zuin(mChewingContext, CHEWING_STRING_PREEDIT_ZUIN);
+    if (preedit_zuin.IsEmpty()) {
+        // Remove composition
+        if (_IsComposing())
+        {
+            TF_SELECTION tfSelection;
+
+            // FIXME: Why we need this here?
+            // first, test where a keystroke would go in the document if an insert is done
+            if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched != 1)
+                return S_FALSE;
+
+            // FIXME: Why we need this here?
+            // is the insertion point covered by a composition?
+            if (_pComposition->GetRange(&pRangeComposition) == S_OK)
+            {
+                fCovered = IsRangeCovered(ec, tfSelection.range, pRangeComposition);
+
+                pRangeComposition->Release();
+
+                if (!fCovered)
+                {
+                    goto End;
+                }
+            }
+
+            // Empties the composition
+            tfSelection.range->SetText(ec, 0, L"", 0);
+
+            _TerminateComposition(ec, pContext);
+End: // FIXME: RAII?
+            tfSelection.range->Release();
+        }
+    } else {
+        if (!_IsComposing())
+            _StartComposition(pContext);
 
         TF_SELECTION tfSelection;
         // FIXME: Why we need this here?
@@ -194,38 +213,14 @@ HRESULT CTextService::_HandleKey(TfEditCookie ec, ITfContext *pContext, WPARAM w
 
             if (!fCovered)
             {
-                goto Exit;
+                goto End2;
             }
         }
+        if (tfSelection.range->SetText(ec, 0, preedit_zuin.GetUtf16String(), preedit_zuin.GetUtf16StringLength()) != S_OK)
+            goto End2;
 
-        // FIXME: What is the correct selection?
-        if (hasPreedit)
-        {
-            // insert text in preedit buffer
-            ChewingString preeditString(chewing_buffer_String(mChewingContext));
-            if (tfSelection.range->SetText(ec, 0, preeditString.GetUtf16String(), preeditString.GetUtf16StringLength()) != S_OK)
-                goto Exit;
-
-            tfSelection.range->Collapse(ec, TF_ANCHOR_END);
-            pContext->SetSelection(ec, 1, &tfSelection);
-        }
-
-        if (hasZuin)
-        {
-            // insert text in zuin buffer
-            int dummy;
-            ChewingString zuinString(chewing_zuin_String(mChewingContext, &dummy));
-            if (tfSelection.range->SetText(ec, 0, zuinString.GetUtf16String(), zuinString.GetUtf16StringLength()) != S_OK)
-                goto Exit;
-
-            //tfSelection.range->Collapse(ec, TF_ANCHOR_END);
-            //pContext->SetSelection(ec, 1, &tfSelection);
-        }
-        //
-        // set the display attribute to the composition range.
-        //
         _SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeInput);
-Exit:
+End2: // FIXME: RAII?
         tfSelection.range->Release();
     }
 
