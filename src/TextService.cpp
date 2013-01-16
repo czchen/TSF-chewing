@@ -237,6 +237,8 @@ STDAPI CTextService::Activate(ITfThreadMgr *pThreadMgr, TfClientId tfClientId)
     if (!_InitDisplayAttributeGuidAtom())
         goto ExitError;
 
+    _SetKeyboardOpen(TRUE);
+
     return S_OK;
 
 ExitError:
