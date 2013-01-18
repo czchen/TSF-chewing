@@ -11,7 +11,7 @@
 #include "chewing.h"
 
 ChewingString::ChewingString(ChewingContext *context, ChewingStringType type)
-:mUtf16String()
+:mString()
 {
     assert(context);
 
@@ -49,25 +49,73 @@ ChewingString::ChewingString(ChewingContext *context, ChewingStringType type)
     if (len == 0) // FIXME: log error here
         return;
 
-    mUtf16String.resize(len);
-    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, &str[0], str.size(), &mUtf16String[0], mUtf16String.size());
+    mString.resize(len);
+    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, &str[0], str.size(), &mString[0], mString.size());
 }
 
 ChewingString::~ChewingString()
 {
 }
 
-const wchar_t *ChewingString::GetUtf16String()
+const wchar_t *ChewingString::GetString()
 {
-    return &mUtf16String[0];
+    return &mString.at(0);
 }
 
-int ChewingString::GetUtf16StringLength()
+int ChewingString::GetLength()
 {
-    return mUtf16String.size();
+    return mString.size();
 }
 
 int ChewingString::IsEmpty()
 {
-    return mUtf16String.empty();
+    return mString.empty();
+}
+
+ChewingCandidates::ChewingCandidates(ChewingContext *context)
+{
+    assert(context);
+
+    if (chewing_cand_TotalPage(context)) {
+        mCandidatePerPage = chewing_cand_ChoicePerPage(context);
+        mCurrentPage = chewing_cand_CurrentPage(context);
+
+        int count = mCandidatePerPage;
+
+        // FIXME: chewing_cand_Enumerate does not set cand_no to 0.
+        chewing_cand_Enumerate(context);
+
+        // FIXME: chewing_cand_hasNext will not stop when reaching page end.
+        while (chewing_cand_hasNext(context) && count--) {
+            std::shared_ptr<char> candidateUtf8(chewing_cand_String(context), chewing_free);
+            int len = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, candidateUtf8.get(), strlen(candidateUtf8.get()), NULL, 0);
+            std::vector<wchar_t> candidateUtf16(len);
+            MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, candidateUtf8.get(), strlen(candidateUtf8.get()), &candidateUtf16[0], candidateUtf16.size());
+            mCandidate.push_back(candidateUtf16);
+        }
+    }
+}
+
+ChewingCandidates::~ChewingCandidates()
+{
+}
+
+const wchar_t *ChewingCandidates::GetCandidate(int index) const
+{
+    return &mCandidate.at(index)[0];
+}
+
+int ChewingCandidates::GetCandidateLength(int index) const
+{
+    return mCandidate.at(index).size();
+}
+
+int ChewingCandidates::IsEmpty() const
+{
+    return mCandidate.empty();
+}
+
+int ChewingCandidates::GetCandidateCount() const
+{
+    return mCandidate.size();
 }

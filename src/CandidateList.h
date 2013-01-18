@@ -16,6 +16,8 @@
 #ifndef CANDIDATELIST_H
 #define CANDIDATELIST_H
 
+#include "Util.h"
+
 class CCandidateWindow;
 
 class CCandidateList : public ITfContextKeyEventSink,
@@ -45,7 +47,7 @@ public:
     //
     STDMETHODIMP OnLayoutChange(ITfContext *pContext, TfLayoutCode lcode, ITfContextView *pContextView);
 
-    HRESULT _StartCandidateList(TfClientId tid, ITfDocumentMgr *pDocumentMgr, ITfContext *pContextDocument, TfEditCookie ec, ITfRange *pRangeComposition);
+    HRESULT _StartCandidateList(TfClientId tid, ITfDocumentMgr *pDocumentMgr, ITfContext *pContextDocument, TfEditCookie ec, ITfRange *pRangeComposition, const ChewingCandidates &candidate);
     void _EndCandidateList();
 
     BOOL _IsContextCandidateWindow(ITfContext *pContext);

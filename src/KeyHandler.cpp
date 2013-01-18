@@ -81,10 +81,6 @@ BOOL IsRangeCovered(TfEditCookie ec, ITfRange *pRangeTest, ITfRange *pRangeCover
 
 HRESULT CTextService::_HandleKey(TfEditCookie ec, ITfContext *pContext, WPARAM wParam)
 {
-    ITfRange *pRangeComposition;
-    ULONG cFetched;
-//    WCHAR ch;
-    BOOL fCovered;
 
     /*
      * FIXME: the following keys are not handled:
@@ -172,38 +168,69 @@ HRESULT CTextService::_HandleKey(TfEditCookie ec, ITfContext *pContext, WPARAM w
         }
     }
 
+    // Remove old candidate list. We will create a new one if necessary.
+    _pCandidateList->_EndCandidateList();
+
+    ChewingCandidates candidate(mChewingContext);
+    if (!candidate.IsEmpty()) {
+        _SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeConverted);
+
+        //
+        // The document manager object is not cached. Get it from pContext.
+        //
+        ITfDocumentMgr *pDocumentMgr;
+        if (pContext->GetDocumentMgr(&pDocumentMgr) == S_OK)
+        {
+            //
+            // get the composition range.
+            //
+            ITfRange *pRange;
+            if (_pComposition->GetRange(&pRange) == S_OK)
+            {
+                _pCandidateList->_StartCandidateList(_tfClientId, pDocumentMgr, pContext, ec, pRange, candidate);
+                pRange->Release();
+            }
+            pDocumentMgr->Release();
+        }
+        return S_OK;
+    }
+
     ChewingString commit(mChewingContext, CHEWING_STRING_COMMIT);
     if (!commit.IsEmpty()) {
         // FIXME: Need a better way to submit a string
         if (!_IsComposing())
             _StartComposition(pContext);
-            TF_SELECTION tfSelection;
 
-            // FIXME: Why we need this here?
-            // first, test where a keystroke would go in the document if an insert is done
-            if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched != 1)
-                return S_FALSE;
+        ULONG cFetched;
+        BOOL fCovered;
+        TF_SELECTION tfSelection;
 
-            // FIXME: Why we need this here?
-            // is the insertion point covered by a composition?
-            if (_pComposition->GetRange(&pRangeComposition) == S_OK)
+        // FIXME: Why we need this here?
+        // first, test where a keystroke would go in the document if an insert is done
+        if (pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched != 1)
+            return S_FALSE;
+
+        // FIXME: Why we need this here?
+        // is the insertion point covered by a composition?
+        ITfRange *pRangeComposition;
+        if (_pComposition->GetRange(&pRangeComposition) == S_OK)
+        {
+            fCovered = IsRangeCovered(ec, tfSelection.range, pRangeComposition);
+
+            pRangeComposition->Release();
+
+            if (!fCovered)
             {
-                fCovered = IsRangeCovered(ec, tfSelection.range, pRangeComposition);
-
-                pRangeComposition->Release();
-
-                if (!fCovered)
-                {
-                    goto End3;
-                }
-            }
-
-            if (tfSelection.range->SetText(ec, 0, commit.GetUtf16String(), commit.GetUtf16StringLength()) != S_OK)
                 goto End3;
+            }
+        }
 
-            _TerminateComposition(ec, pContext);
+        if (tfSelection.range->SetText(ec, 0, commit.GetString(), commit.GetLength()) != S_OK)
+            goto End3;
+
+        _TerminateComposition(ec, pContext);
 End3: // FIXME: RAII?
-            tfSelection.range->Release();
+        tfSelection.range->Release();
     }
 
     /*
@@ -214,6 +241,8 @@ End3: // FIXME: RAII?
         // Remove composition
         if (_IsComposing())
         {
+            ULONG cFetched;
+            BOOL fCovered;
             TF_SELECTION tfSelection;
 
             // FIXME: Why we need this here?
@@ -223,6 +252,7 @@ End3: // FIXME: RAII?
 
             // FIXME: Why we need this here?
             // is the insertion point covered by a composition?
+            ITfRange *pRangeComposition;
             if (_pComposition->GetRange(&pRangeComposition) == S_OK)
             {
                 fCovered = IsRangeCovered(ec, tfSelection.range, pRangeComposition);
@@ -246,6 +276,8 @@ End: // FIXME: RAII?
         if (!_IsComposing())
             _StartComposition(pContext);
 
+        ULONG cFetched;
+        BOOL fCovered;
         TF_SELECTION tfSelection;
         // FIXME: Why we need this here?
         // first, test where a keystroke would go in the document if an insert is done
@@ -254,6 +286,7 @@ End: // FIXME: RAII?
 
         // FIXME: Why we need this here?
         // is the insertion point covered by a composition?
+        ITfRange *pRangeComposition;
         if (_pComposition->GetRange(&pRangeComposition) == S_OK)
         {
             fCovered = IsRangeCovered(ec, tfSelection.range, pRangeComposition);
@@ -265,7 +298,7 @@ End: // FIXME: RAII?
                 goto End2;
             }
         }
-        if (tfSelection.range->SetText(ec, 0, preedit_zuin.GetUtf16String(), preedit_zuin.GetUtf16StringLength()) != S_OK)
+        if (tfSelection.range->SetText(ec, 0, preedit_zuin.GetString(), preedit_zuin.GetLength()) != S_OK)
             goto End2;
 
         _SetCompositionDisplayAttributes(ec, pContext, _gaDisplayAttributeInput);

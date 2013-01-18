@@ -17,6 +17,7 @@
 #define TEXTSERVICE_H
 
 #include "chewing.h"
+#include "Util.h"
 
 class CLangBarItemButton;
 class CCandidateList;

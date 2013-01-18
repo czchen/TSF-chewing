@@ -13,11 +13,13 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include <iterator>
+
 #include "Globals.h"
 #include "TextService.h"
 #include "CandidateWindow.h"
 
-#define CAND_WIDTH     200
+#define CAND_WIDTH     500
 #define CAND_HEIGHT    50
 
 ATOM CCandidateWindow::_atomWndClass = 0;
@@ -30,8 +32,15 @@ const TCHAR c_szCandidateDescription[] = TEXT("Dummy Candidate Window");
 //
 //----------------------------------------------------------------------------
 
-CCandidateWindow::CCandidateWindow()
+CCandidateWindow::CCandidateWindow(const ChewingCandidates &candidates)
 {
+    static const wchar_t SEPARATE[] = { ' ' };
+    std::back_insert_iterator<std::vector<wchar_t> > insert = std::back_inserter(mCandidates);
+    for (int i = 0; i < candidates.GetCandidateCount(); ++i) {
+        std::copy(candidates.GetCandidate(i), candidates.GetCandidate(i) + candidates.GetCandidateLength(i), insert);
+        std::copy(SEPARATE, SEPARATE + ArrayLength(SEPARATE), insert);
+    }
+    wchar_t *ptr = &mCandidates[0];
     _hwnd = NULL;
 }
 
@@ -188,6 +197,7 @@ LRESULT CALLBACK CCandidateWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wPar
 {
     HDC hdc;
     PAINTSTRUCT ps;
+    CCandidateWindow* this_;
 
     switch (uMsg)
     {
@@ -197,8 +207,9 @@ LRESULT CALLBACK CCandidateWindow::_WindowProc(HWND hwnd, UINT uMsg, WPARAM wPar
 
         case WM_PAINT:
             hdc = BeginPaint(hwnd, &ps);
+            this_ = _GetThis(hwnd);
             SetBkMode(hdc, TRANSPARENT);
-            TextOut(hdc, 0, 0, c_szCandidateDescription, lstrlen(c_szCandidateDescription));
+            TextOutW(hdc, 0, 0, &this_->mCandidates[0], this_->mCandidates.size());
             EndPaint(hwnd, &ps);
             return 0;
     }

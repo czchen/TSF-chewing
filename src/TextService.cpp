@@ -237,6 +237,9 @@ STDAPI CTextService::Activate(ITfThreadMgr *pThreadMgr, TfClientId tfClientId)
     if (!_InitDisplayAttributeGuidAtom())
         goto ExitError;
 
+    if (_pCandidateList == NULL)
+        _pCandidateList = new CCandidateList(this);
+
     _SetKeyboardOpen(TRUE);
 
     return S_OK;
@@ -254,12 +257,8 @@ ExitError:
 
 STDAPI CTextService::Deactivate()
 {
-    // delete the candidate list object if it exists.
-    if (_pCandidateList != NULL)
-    {
-        delete _pCandidateList;
-        _pCandidateList = NULL;
-    }
+    delete _pCandidateList;
+    _pCandidateList = NULL;
 
     //
     // Unadvise TextEditSink if it is advised.

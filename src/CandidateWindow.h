@@ -16,6 +16,10 @@
 #ifndef CANDIDATEWINDOW_H
 #define CANDIDATEWINDOW_H
 
+#include <vector>
+
+#include "Util.h"
+
 //+---------------------------------------------------------------------------
 //
 // CCandidateWindow
@@ -25,7 +29,7 @@
 class CCandidateWindow 
 {
 public:
-    CCandidateWindow();
+    CCandidateWindow(const ChewingCandidates &candidates);
 
     static BOOL _InitWindowClass();
     static void _UninitWindowClass();
@@ -55,6 +59,8 @@ private:
     }
 
     static ATOM _atomWndClass;
+
+    std::vector<wchar_t> mCandidates;
 
     HWND _hwnd;
 };

@@ -282,7 +282,7 @@ STDAPI CCandidateList::OnLayoutChange(ITfContext *pContext, TfLayoutCode lcode, 
 //
 //----------------------------------------------------------------------------
 
-HRESULT CCandidateList::_StartCandidateList(TfClientId tfClientId, ITfDocumentMgr *pDocumentMgr, ITfContext *pContextDocument, TfEditCookie ec, ITfRange *pRangeComposition)
+HRESULT CCandidateList::_StartCandidateList(TfClientId tfClientId, ITfDocumentMgr *pDocumentMgr, ITfContext *pContextDocument, TfEditCookie ec, ITfRange *pRangeComposition, const ChewingCandidates &candidate)
 {
     TfEditCookie ecTmp;
     HRESULT hr = E_FAIL;
@@ -319,8 +319,9 @@ HRESULT CCandidateList::_StartCandidateList(TfClientId tfClientId, ITfDocumentMg
     // 
     // advise ITfContextKeyEventSink to the new context.
     // 
-    if (FAILED(_AdviseContextKeyEventSink()))
-        goto Exit;
+    // XXX: Let _HandleKey to handle all keys.
+//    if (FAILED(_AdviseContextKeyEventSink()))
+//        goto Exit;
 
     // 
     // advise ITfTextLayoutSink to the document context.
@@ -331,7 +332,7 @@ HRESULT CCandidateList::_StartCandidateList(TfClientId tfClientId, ITfDocumentMg
     // 
     // create an instance of CCandidateWindow class.
     //
-    if (_pCandidateWindow = new CCandidateWindow())
+    if (_pCandidateWindow = new CCandidateWindow(candidate))
     {
         RECT rc;
         ITfContextView *pContextView;
@@ -394,7 +395,7 @@ void CCandidateList::_EndCandidateList()
 
     if (_pContextCandidateWindow)
     {
-       _UnadviseContextKeyEventSink();
+//      _UnadviseContextKeyEventSink();
        _pContextCandidateWindow->Release();
        _pContextCandidateWindow = NULL;
     }
