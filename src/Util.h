@@ -26,31 +26,3 @@ private:
 
     std::vector<wchar_t> mUtf16String;
 };
-
-template<typename T>
-class ComObject {
-public:
-    ComObject(T* ptr = NULL):mPtr(ptr){}
-    ~ComObject()
-    {
-        if (mPtr)
-            mPtr->Release();
-    }
-
-    T*& GetPointer()
-    {
-        return mPtr;
-    }
-
-    T* operator->()
-    {
-        assert(mPtr);
-        return mPtr;
-    }
-
-private:
-    ComObject(const ComObject&);
-    ComObject& operator=(const ComObject&);
-
-    T *mPtr;
-};
