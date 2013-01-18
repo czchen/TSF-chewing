@@ -5,7 +5,7 @@ add_subdirectory(libchewing)
 include_directories(libchewing/include)
 
 # http://www.utf8everywhere.org/
-add_definitions(/D_UNICODE=1)
+add_definitions(/D_UNICODE=1 /DUNICODE=1)
 
 set(SRC ${PROJECT_SOURCE_DIR}/src)
 
