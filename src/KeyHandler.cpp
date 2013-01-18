@@ -96,7 +96,6 @@ HRESULT CTextService::_HandleKey(TfEditCookie ec, ITfContext *pContext, WPARAM w
      * ctrl num
      * shift space
      * numlock num
-     * -=\[];',./
      */
 
     if (('A' <= wParam && wParam <= 'Z')) {
@@ -105,6 +104,26 @@ HRESULT CTextService::_HandleKey(TfEditCookie ec, ITfContext *pContext, WPARAM w
             chewing_handle_Default(mChewingContext, wParam);
     } else {
         switch(wParam) {
+            case VK_OEM_COMMA:
+                chewing_handle_Default(mChewingContext, ',');
+                break;
+
+            case VK_OEM_MINUS:
+                chewing_handle_Default(mChewingContext, '-');
+                break;
+
+            case VK_OEM_PERIOD:
+                chewing_handle_Default(mChewingContext, '.');
+                break;
+
+            case VK_OEM_1:
+                chewing_handle_Default(mChewingContext, ';');
+                break;
+
+            case VK_OEM_2:
+                chewing_handle_Default(mChewingContext, '/');
+                break;
+
             case VK_SPACE:
                 chewing_handle_Space(mChewingContext);
                 break;
