@@ -84,15 +84,15 @@ HRESULT CTextService::_HandleKey(TfEditCookie ec, ITfContext *pContext, WPARAM w
 
     /*
      * FIXME: the following keys are not handled:
-     * shift left
-     * shift right
-     * caps lock
-     * page up
-     * page down
+     * shift left		VK_LSHIFT
+     * shift right		VK_RSHIFT
+     * caps lock		VK_CAPITAL
+     * page up			VK_PRIOR
+     * page down		VK_NEXT
      * ctrl num
      * shift space
-     * numlock num
-     */
+     * numlock num		VK_NUMLOCK
+	 */
 
     if (('A' <= wParam && wParam <= 'Z')) {
             chewing_handle_Default(mChewingContext, wParam - 'A' + 'a');
