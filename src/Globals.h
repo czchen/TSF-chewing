@@ -27,10 +27,10 @@ void DllRelease();
 
 template<typename T, size_t N> size_t ArrayLength(T (&array)[N]) { return N; }
 
-#define TEXTSERVICE_LANGID    MAKELANGID(LANG_CHINESE_TRADITIONAL, SUBLANG_CHINESE_TRADITIONAL)
+#define TEXTSERVICE_LANGID    MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL)
 
 #define TEXTSERVICE_DESC    L"Sample Text Service"
-#define TEXTSERVICE_DESC_A   "Sample Text Service"
+#define TEXTSERVICE_DESC_A  TEXT(Sample Text Service)
 #define TEXTSERVICE_MODEL   TEXT("Apartment")
 
 #define TEXTSERVICE_ICON_INDEX  0
