@@ -120,6 +120,10 @@ HRESULT CTextService::_HandleKey(TfEditCookie ec, ITfContext *pContext, WPARAM w
                 chewing_handle_Default(mChewingContext, '/');
                 break;
 
+            case VK_OEM_3:
+                chewing_handle_Default(mChewingContext, '`');
+                break;
+
             case VK_SPACE:
                 chewing_handle_Space(mChewingContext);
                 break;
