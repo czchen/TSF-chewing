@@ -46,7 +46,7 @@ protected:
     const GUID *_pguid;
     const TF_DISPLAYATTRIBUTE *_pDisplayAttribute;
     const WCHAR *_pszDescription;
-    const TCHAR *_pszValueName;
+    const WCHAR *_pszValueName;
 
 private:
     LONG _cRef; // COM ref count
@@ -71,7 +71,7 @@ public:
 
     static const TF_DISPLAYATTRIBUTE _s_DisplayAttribute;
     static const WCHAR _s_szDescription[];
-    static const TCHAR _s_szValueName[];
+    static const WCHAR _s_szValueName[];
 };
 
 //+---------------------------------------------------------------------------
@@ -93,7 +93,7 @@ public:
 
     static const TF_DISPLAYATTRIBUTE _s_DisplayAttribute;
     static const WCHAR _s_szDescription[];
-    static const TCHAR _s_szValueName[];
+    static const WCHAR _s_szValueName[];
 };
 
 #endif DISPLAYATTRIBUTEINFO_H

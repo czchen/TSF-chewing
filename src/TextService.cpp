@@ -5,9 +5,9 @@
 //  TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 //  PARTICULAR PURPOSE.
 //
-//  Copyright (C) 2003  Microsoft Corporation.  All rights reserved.
+//  Copyright (C) Microsoft Corporation.  All rights reserved.
 //
-//  TextService.cpp
+//  CTextService.cpp
 //
 //          IUnknown, ITfTextInputProcessor implementation.
 //
