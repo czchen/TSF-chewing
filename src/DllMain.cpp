@@ -5,7 +5,7 @@
 //  TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 //  PARTICULAR PURPOSE.
 //
-//  Copyright (C) 2003  Microsoft Corporation.  All rights reserved.
+//  Copyright (C) Microsoft Corporation.  All rights reserved.
 //
 //  DllMain.cpp
 //
@@ -35,7 +35,6 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID pvReserved)
 
             // register candidate window class.
             CCandidateWindow::_InitWindowClass();
-
             break;
 
         case DLL_PROCESS_DETACH:
