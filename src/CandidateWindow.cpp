@@ -38,7 +38,7 @@ CCandidateWindow::CCandidateWindow(const ChewingCandidates &candidates)
     std::back_insert_iterator<std::vector<wchar_t> > insert = std::back_inserter(mCandidates);
     for (int i = 0; i < candidates.GetCandidateCount(); ++i) {
         std::copy(candidates.GetCandidate(i), candidates.GetCandidate(i) + candidates.GetCandidateLength(i), insert);
-        std::copy(SEPARATE, SEPARATE + ArrayLength(SEPARATE), insert);
+        std::copy(SEPARATE, SEPARATE + ARRAYSIZE(SEPARATE), insert);
     }
     wchar_t *ptr = &mCandidates[0];
     _hwnd = NULL;

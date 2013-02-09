@@ -23,11 +23,11 @@
 //----------------------------------------------------------------------------
 
 // the registry key of this text service to save the custmized display attribute
-const TCHAR c_szAttributeInfoKey[] = TEXT("Software\\Sample Text Service");
+const WCHAR c_szAttributeInfoKey[] = L"Software\\Sample Text Service";
 
 // the registry values of the custmized display attributes
-const TCHAR CDisplayAttributeInfoInput::_s_szValueName[] = TEXT("DisplayAttributeInput");
-const TCHAR CDisplayAttributeInfoConverted::_s_szValueName[] = TEXT("DisplayAttributeConverted");
+const WCHAR CDisplayAttributeInfoInput::_s_szValueName[] = L"DisplayAttributeInput";
+const WCHAR CDisplayAttributeInfoConverted::_s_szValueName[] = L"DisplayAttributeConverted";
 
 //+---------------------------------------------------------------------------
 //
@@ -214,11 +214,11 @@ STDAPI CDisplayAttributeInfo::GetAttributeInfo(TF_DISPLAYATTRIBUTE *ptfDisplayAt
 
     lResult = E_FAIL;
 
-    if (RegOpenKeyEx(HKEY_CURRENT_USER, c_szAttributeInfoKey, 0, KEY_READ, &hKeyAttributeInfo) == ERROR_SUCCESS)
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, c_szAttributeInfoKey, 0, KEY_READ, &hKeyAttributeInfo) == ERROR_SUCCESS)
     {
         cbData = sizeof(*ptfDisplayAttr);
 
-        lResult = RegQueryValueEx(hKeyAttributeInfo, _pszValueName,
+        lResult = RegQueryValueExW(hKeyAttributeInfo, _pszValueName,
                                   NULL, NULL,
                                   (LPBYTE)ptfDisplayAttr, &cbData);
 
@@ -248,14 +248,14 @@ STDAPI CDisplayAttributeInfo::SetAttributeInfo(const TF_DISPLAYATTRIBUTE *ptfDis
     if (_pszValueName == NULL)
         return E_FAIL;
 
-    lResult = RegCreateKeyEx(HKEY_CURRENT_USER, c_szAttributeInfoKey, 0, TEXT(""),
+    lResult = RegCreateKeyExW(HKEY_CURRENT_USER, c_szAttributeInfoKey, 0, L"",
                              REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL,
                              &hKeyAttributeInfo, NULL);
 
     if (lResult != ERROR_SUCCESS)
         return E_FAIL;
 
-    lResult = RegSetValueEx(hKeyAttributeInfo, _pszValueName,
+    lResult = RegSetValueExW(hKeyAttributeInfo, _pszValueName,
                             0, REG_BINARY, (const BYTE *)ptfDisplayAttr,
                             sizeof(*ptfDisplayAttr));
 

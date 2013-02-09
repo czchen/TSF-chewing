@@ -5,7 +5,7 @@
 //  TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 //  PARTICULAR PURPOSE.
 //
-//  Copyright (C) 2003  Microsoft Corporation.  All rights reserved.
+//  Copyright (C) Microsoft Corporation.  All rights reserved.
 //
 //  Register.cpp
 //
@@ -20,9 +20,9 @@
 
 #define CLSID_STRLEN 38  // strlen("{xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx}")
 
-static const TCHAR c_szInfoKeyPrefix[] = TEXT("CLSID\\");
-static const TCHAR c_szInProcSvr32[] = TEXT("InProcServer32");
-static const TCHAR c_szModelName[] = TEXT("ThreadingModel");
+static const WCHAR c_szInfoKeyPrefix[] = L"CLSID\\";
+static const WCHAR c_szInProcSvr32[] = L"InProcServer32";
+static const WCHAR c_szModelName[] = L"ThreadingModel";
 
 //+---------------------------------------------------------------------------
 //
@@ -34,9 +34,9 @@ BOOL RegisterProfiles()
 {
     ITfInputProcessorProfiles *pInputProcessProfiles;
     WCHAR achIconFile[MAX_PATH];
-    char achFileNameA[MAX_PATH];
-    DWORD cchA;
-    int cchIconFile;
+    WCHAR achFileName[MAX_PATH];
+    DWORD cch;
+    int cchIconFile=0;
     HRESULT hr;
 
     hr = CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER,
@@ -50,9 +50,9 @@ BOOL RegisterProfiles()
     if (hr != S_OK)
         goto Exit;
 
-    cchA = GetModuleFileNameA(g_hInst, achFileNameA, ArrayLength(achFileNameA));
+    cch = GetModuleFileNameW(g_hInst, achFileName, ARRAYSIZE(achFileName));
 
-    cchIconFile = MultiByteToWideChar(CP_ACP, 0, achFileNameA, cchA, achIconFile, ArrayLength(achIconFile)-1);
+
     achIconFile[cchIconFile] = '\0';
 
     hr = pInputProcessProfiles->AddLanguageProfile(c_clsidTextService,
@@ -160,26 +160,23 @@ void UnregisterCategories()
     pCategoryMgr->Release();
     return;
 }
-
-//+---------------------------------------------------------------------------
-//
 // CLSIDToStringA
 //
 //----------------------------------------------------------------------------
 
-BOOL CLSIDToStringA(REFGUID refGUID, char *pchA)
+BOOL CLSIDToStringW(REFGUID refGUID, WCHAR *pchW)
 {
     static const BYTE GuidMap[] = {3, 2, 1, 0, '-', 5, 4, '-', 7, 6, '-',
                                    8, 9, '-', 10, 11, 12, 13, 14, 15};
 
-    static const char szDigits[] = "0123456789ABCDEF";
+    static const WCHAR szDigits[] = L"0123456789ABCDEF";
 
     int i;
-    char *p = pchA;
+    WCHAR *p = pchW;
 
     const BYTE * pBytes = (const BYTE *) &refGUID;
 
-    *p++ = '{';
+    *p++ = L'{';
     for (i = 0; i < sizeof(GuidMap); i++)
     {
         if (GuidMap[i] == '-')
@@ -193,7 +190,7 @@ BOOL CLSIDToStringA(REFGUID refGUID, char *pchA)
         }
     }
 
-    *p++ = '}';
+    *p++ = L'}';
     *p   = '\0';
 
     return TRUE;
@@ -206,29 +203,29 @@ BOOL CLSIDToStringA(REFGUID refGUID, char *pchA)
 // RecurseDeleteKey is necessary because on NT RegDeleteKey doesn't work if the
 // specified key has subkeys
 //----------------------------------------------------------------------------
-LONG RecurseDeleteKey(HKEY hParentKey, LPCTSTR lpszKey)
+LONG RecurseDeleteKey(HKEY hParentKey, LPCWSTR lpszKey)
 {
     HKEY hKey;
     LONG lRes;
     FILETIME time;
-    TCHAR szBuffer[256];
-    DWORD dwSize = ArrayLength(szBuffer);
+    WCHAR szBuffer[256];
+    DWORD dwSize = ARRAYSIZE(szBuffer);
 
-    if (RegOpenKey(hParentKey, lpszKey, &hKey) != ERROR_SUCCESS)
-        return ERROR_SUCCESS; // assume it couldn't be opened because it's not there
+    if (RegOpenKeyW(hParentKey, lpszKey, &hKey) != ERROR_SUCCESS)
+        return ERROR_SUCCESS; // let's assume it couldn't be opened because it's not there
 
     lRes = ERROR_SUCCESS;
-    while (RegEnumKeyEx(hKey, 0, szBuffer, &dwSize, NULL, NULL, NULL, &time)==ERROR_SUCCESS)
+    while (RegEnumKeyExW(hKey, 0, szBuffer, &dwSize, NULL, NULL, NULL, &time)==ERROR_SUCCESS)
     {
         szBuffer[ARRAYSIZE(szBuffer)-1] = '\0';
         lRes = RecurseDeleteKey(hKey, szBuffer);
         if (lRes != ERROR_SUCCESS)
             break;
-        dwSize = ArrayLength(szBuffer);
+        dwSize = ARRAYSIZE(szBuffer);
     }
     RegCloseKey(hKey);
 
-    return lRes == ERROR_SUCCESS ? RegDeleteKey(hParentKey, lpszKey) : lRes;
+    return lRes == ERROR_SUCCESS ? RegDeleteKeyW(hParentKey, lpszKey) : lRes;
 }
 
 //+---------------------------------------------------------------------------
@@ -243,31 +240,39 @@ BOOL RegisterServer()
     HKEY hKey;
     HKEY hSubKey;
     BOOL fRet;
-    TCHAR achIMEKey[ARRAYSIZE(c_szInfoKeyPrefix) + CLSID_STRLEN];
-    TCHAR achFileName[MAX_PATH];
+    WCHAR achIMEKey[ARRAYSIZE(c_szInfoKeyPrefix) + CLSID_STRLEN];
+    WCHAR achFileName[MAX_PATH];
 
-    if (!CLSIDToStringA(c_clsidTextService, achIMEKey + ArrayLength(c_szInfoKeyPrefix) - 1))
+
+
+    if (!CLSIDToStringW(c_clsidTextService, achIMEKey + ARRAYSIZE(c_szInfoKeyPrefix) - 1))
         return FALSE;
-    memcpy(achIMEKey, c_szInfoKeyPrefix, sizeof(c_szInfoKeyPrefix)-sizeof(TCHAR));
+    memcpy(achIMEKey, c_szInfoKeyPrefix, sizeof(c_szInfoKeyPrefix)-sizeof(WCHAR));
+	
 
-    if (fRet = RegCreateKeyEx(HKEY_CLASSES_ROOT, achIMEKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, &dw)
+    if (fRet = RegCreateKeyExW(HKEY_CLASSES_ROOT, achIMEKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, &dw)
             == ERROR_SUCCESS)
     {
-        fRet &= RegSetValueEx(hKey, NULL, 0, REG_SZ, (BYTE *)TEXTSERVICE_DESC_A, (lstrlen(TEXTSERVICE_DESC_A)+1)*sizeof(TCHAR))
+        fRet &= RegSetValueExW(hKey, NULL, 0, REG_SZ, (BYTE *)TEXTSERVICE_DESC_A, (lstrlenA(TEXTSERVICE_DESC_A)+1)*sizeof(BYTE))
             == ERROR_SUCCESS;
 
-        if (fRet &= RegCreateKeyEx(hKey, c_szInProcSvr32, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hSubKey, &dw)
+        if (fRet &= RegCreateKeyExW(hKey, c_szInProcSvr32, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hSubKey, &dw)
             == ERROR_SUCCESS)
         {
-            dw = GetModuleFileNameA(g_hInst, achFileName, ArrayLength(achFileName));
-
-            fRet &= RegSetValueEx(hSubKey, NULL, 0, REG_SZ, (BYTE *)achFileName, (lstrlen(achFileName)+1)*sizeof(TCHAR)) == ERROR_SUCCESS;
-            fRet &= RegSetValueEx(hSubKey, c_szModelName, 0, REG_SZ, (BYTE *)TEXTSERVICE_MODEL, (lstrlen(TEXTSERVICE_MODEL)+1)*sizeof(TCHAR)) == ERROR_SUCCESS;
+            dw = GetModuleFileNameW(g_hInst, achFileName, ARRAYSIZE(achFileName));
+			size_t origsize = wcslen(achFileName) + 1;
+			const size_t newsize = 100;
+			size_t convertedChars = 0;
+			char achFileNameA[newsize];
+			wcstombs_s(&convertedChars, achFileNameA, origsize, achFileName, _TRUNCATE);
+			strcat_s(achFileNameA, " (char *)");
+            fRet &= RegSetValueExW(hSubKey, NULL, 0, REG_SZ, (BYTE *)achFileNameA, (lstrlenA(achFileNameA)+1)*sizeof(CHAR)) == ERROR_SUCCESS;
+            fRet &= RegSetValueExW(hSubKey, c_szModelName, 0, REG_SZ, (BYTE *)TEXTSERVICE_MODEL_A, (lstrlenA(TEXTSERVICE_MODEL_A)+1)*sizeof(TCHAR)) == ERROR_SUCCESS;
             RegCloseKey(hSubKey);
         }
         RegCloseKey(hKey);
     }
-
+	
     return fRet;
 }
 
@@ -279,11 +284,11 @@ BOOL RegisterServer()
 
 void UnregisterServer()
 {
-    TCHAR achIMEKey[ARRAYSIZE(c_szInfoKeyPrefix) + CLSID_STRLEN];
+    WCHAR achIMEKey[ARRAYSIZE(c_szInfoKeyPrefix) + CLSID_STRLEN];
 
-    if (!CLSIDToStringA(c_clsidTextService, achIMEKey + ArrayLength(c_szInfoKeyPrefix) - 1))
+    if (!CLSIDToStringW(c_clsidTextService, achIMEKey + ARRAYSIZE(c_szInfoKeyPrefix) - 1))
         return;
-    memcpy(achIMEKey, c_szInfoKeyPrefix, sizeof(c_szInfoKeyPrefix)-sizeof(TCHAR));
+    memcpy(achIMEKey, c_szInfoKeyPrefix, sizeof(c_szInfoKeyPrefix)-sizeof(WCHAR));
 
     RecurseDeleteKey(HKEY_CLASSES_ROOT, achIMEKey);
 }
