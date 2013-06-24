@@ -5,7 +5,7 @@
 //  TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 //  PARTICULAR PURPOSE.
 //
-//  Copyright (C) 2003  Microsoft Corporation.  All rights reserved.
+//  Copyright(c) Microsoft Corporation.  All rights reserved.
 //
 //  Server.cpp
 //
@@ -191,7 +191,7 @@ void BuildGlobalObjects(void)
 void FreeGlobalObjects(void)
 {
     // Free CClassFactory Objects
-    for (size_t i = 0; i < ArrayLength(g_ObjectInfo); i++)
+    for (int i = 0; i < ARRAYSIZE(g_ObjectInfo); i++)
     {
         if (NULL != g_ObjectInfo[i])
         {
@@ -225,7 +225,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, void **ppvObj)
     if (IsEqualIID(riid, IID_IClassFactory) ||
         IsEqualIID(riid, IID_IUnknown))
     {
-        for (size_t i = 0; i < ArrayLength(g_ObjectInfo); i++)
+        for (int i = 0; i < ARRAYSIZE(g_ObjectInfo); i++)
         {
             if (NULL != g_ObjectInfo[i] &&
                 IsEqualGUID(rclsid, g_ObjectInfo[i]->_rclsid))
