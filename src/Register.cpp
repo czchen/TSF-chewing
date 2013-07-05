@@ -56,9 +56,9 @@ BOOL RegisterProfiles()
     achIconFile[cchIconFile] = '\0';
 
     hr = pInputProcessProfiles->AddLanguageProfile(c_clsidTextService,
-                                  TEXTSERVICE_LANGID, 
-                                  c_guidProfile, 
-                                  TEXTSERVICE_DESC, 
+                                  TEXTSERVICE_LANGID,
+                                  c_guidProfile,
+                                  TEXTSERVICE_DESC,
                                   (ULONG)wcslen(TEXTSERVICE_DESC),
                                   achIconFile,
                                   cchIconFile,
@@ -101,7 +101,7 @@ BOOL RegisterCategories()
     ITfCategoryMgr *pCategoryMgr;
     HRESULT hr;
 
-    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, 
+    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER,
                           IID_ITfCategoryMgr, (void**)&pCategoryMgr);
 
     if (hr != S_OK)
@@ -111,14 +111,14 @@ BOOL RegisterCategories()
     // register this text service to GUID_TFCAT_TIP_KEYBOARD category.
     //
     hr = pCategoryMgr->RegisterCategory(c_clsidTextService,
-                                        GUID_TFCAT_TIP_KEYBOARD, 
+                                        GUID_TFCAT_TIP_KEYBOARD,
                                         c_clsidTextService);
 
     //
     // register this text service to GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER category.
     //
     hr = pCategoryMgr->RegisterCategory(c_clsidTextService,
-                                        GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER, 
+                                        GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER,
                                         c_clsidTextService);
 
 
@@ -137,7 +137,7 @@ void UnregisterCategories()
     ITfCategoryMgr *pCategoryMgr;
     HRESULT hr;
 
-    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER, 
+    hr = CoCreateInstance(CLSID_TF_CategoryMgr, NULL, CLSCTX_INPROC_SERVER,
                           IID_ITfCategoryMgr, (void**)&pCategoryMgr);
 
     if (hr != S_OK)
@@ -147,14 +147,14 @@ void UnregisterCategories()
     // unregister this text service from GUID_TFCAT_TIP_KEYBOARD category.
     //
     pCategoryMgr->UnregisterCategory(c_clsidTextService,
-                                     GUID_TFCAT_TIP_KEYBOARD, 
+                                     GUID_TFCAT_TIP_KEYBOARD,
                                      c_clsidTextService);
 
     //
     // unregister this text service from GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER category.
     //
     pCategoryMgr->UnregisterCategory(c_clsidTextService,
-                                     GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER, 
+                                     GUID_TFCAT_DISPLAYATTRIBUTEPROVIDER,
                                      c_clsidTextService);
 
     pCategoryMgr->Release();
@@ -248,7 +248,7 @@ BOOL RegisterServer()
     if (!CLSIDToStringW(c_clsidTextService, achIMEKey + ARRAYSIZE(c_szInfoKeyPrefix) - 1))
         return FALSE;
     memcpy(achIMEKey, c_szInfoKeyPrefix, sizeof(c_szInfoKeyPrefix)-sizeof(WCHAR));
-	
+
 
     if (fRet = RegCreateKeyExW(HKEY_CLASSES_ROOT, achIMEKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, &dw)
             == ERROR_SUCCESS)
@@ -260,19 +260,19 @@ BOOL RegisterServer()
             == ERROR_SUCCESS)
         {
             dw = GetModuleFileNameW(g_hInst, achFileName, ARRAYSIZE(achFileName));
-			size_t origsize = wcslen(achFileName) + 1;
-			const size_t newsize = 100;
-			size_t convertedChars = 0;
-			char achFileNameA[newsize];
-			wcstombs_s(&convertedChars, achFileNameA, origsize, achFileName, _TRUNCATE);
-			strcat_s(achFileNameA, " (char *)");
+            size_t origsize = wcslen(achFileName) + 1;
+            const size_t newsize = 100;
+            size_t convertedChars = 0;
+            char achFileNameA[newsize];
+            wcstombs_s(&convertedChars, achFileNameA, origsize, achFileName, _TRUNCATE);
+            strcat_s(achFileNameA, " (char *)");
             fRet &= RegSetValueExW(hSubKey, NULL, 0, REG_SZ, (BYTE *)achFileNameA, (lstrlenA(achFileNameA)+1)*sizeof(CHAR)) == ERROR_SUCCESS;
             fRet &= RegSetValueExW(hSubKey, c_szModelName, 0, REG_SZ, (BYTE *)TEXTSERVICE_MODEL_A, (lstrlenA(TEXTSERVICE_MODEL_A)+1)*sizeof(TCHAR)) == ERROR_SUCCESS;
             RegCloseKey(hSubKey);
         }
         RegCloseKey(hKey);
     }
-	
+
     return fRet;
 }
 

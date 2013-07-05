@@ -25,7 +25,7 @@
 void DllAddRef();
 void DllRelease();
 
-#ifndef	ARRAYSIZE
+#ifndef ARRAYSIZE
 #define ARRAYSIZE(a) (sizeof(a)/sizeof(a[0]))
 #endif
 
