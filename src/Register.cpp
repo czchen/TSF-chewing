@@ -243,8 +243,6 @@ BOOL RegisterServer()
     WCHAR achIMEKey[ARRAYSIZE(c_szInfoKeyPrefix) + CLSID_STRLEN];
     WCHAR achFileName[MAX_PATH];
 
-
-
     if (!CLSIDToStringW(c_clsidTextService, achIMEKey + ARRAYSIZE(c_szInfoKeyPrefix) - 1))
         return FALSE;
     memcpy(achIMEKey, c_szInfoKeyPrefix, sizeof(c_szInfoKeyPrefix)-sizeof(WCHAR));
@@ -253,21 +251,15 @@ BOOL RegisterServer()
     if (fRet = RegCreateKeyExW(HKEY_CLASSES_ROOT, achIMEKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, &dw)
             == ERROR_SUCCESS)
     {
-        fRet &= RegSetValueExW(hKey, NULL, 0, REG_SZ, (BYTE *)TEXTSERVICE_DESC_A, (lstrlenA(TEXTSERVICE_DESC_A)+1)*sizeof(BYTE))
+        fRet &= RegSetValueExW(hKey, NULL, 0, REG_SZ, (BYTE*)TEXTSERVICE_DESC, (wcslen(TEXTSERVICE_DESC)+1)*sizeof(wchar_t))
             == ERROR_SUCCESS;
 
         if (fRet &= RegCreateKeyExW(hKey, c_szInProcSvr32, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hSubKey, &dw)
             == ERROR_SUCCESS)
         {
             dw = GetModuleFileNameW(g_hInst, achFileName, ARRAYSIZE(achFileName));
-            size_t origsize = wcslen(achFileName) + 1;
-            const size_t newsize = 100;
-            size_t convertedChars = 0;
-            char achFileNameA[newsize];
-            wcstombs_s(&convertedChars, achFileNameA, origsize, achFileName, _TRUNCATE);
-            strcat_s(achFileNameA, " (char *)");
-            fRet &= RegSetValueExW(hSubKey, NULL, 0, REG_SZ, (BYTE *)achFileNameA, (lstrlenA(achFileNameA)+1)*sizeof(CHAR)) == ERROR_SUCCESS;
-            fRet &= RegSetValueExW(hSubKey, c_szModelName, 0, REG_SZ, (BYTE *)TEXTSERVICE_MODEL_A, (lstrlenA(TEXTSERVICE_MODEL_A)+1)*sizeof(TCHAR)) == ERROR_SUCCESS;
+            fRet &= RegSetValueExW(hSubKey, NULL, 0, REG_SZ, (BYTE *)achFileName, (wcslen(achFileName)+1)*sizeof(achFileName[0])) == ERROR_SUCCESS;
+            fRet &= RegSetValueExW(hSubKey, c_szModelName, 0, REG_SZ, (BYTE*)TEXTSERVICE_MODEL, (wcslen(TEXTSERVICE_MODEL)+1)*sizeof(wchar_t)) == ERROR_SUCCESS;
             RegCloseKey(hSubKey);
         }
         RegCloseKey(hKey);

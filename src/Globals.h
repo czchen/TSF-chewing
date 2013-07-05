@@ -32,8 +32,7 @@ void DllRelease();
 #define TEXTSERVICE_LANGID    MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL)
 
 #define TEXTSERVICE_DESC    L"Sample Text Service"
-#define TEXTSERVICE_DESC_A  "Sample Text Service"
-#define TEXTSERVICE_MODEL_A   "Apartment"
+#define TEXTSERVICE_MODEL   L"Apartment"
 
 #define TEXTSERVICE_ICON_INDEX  0
 #define LANGBAR_ITEM_DESC   L"Sample Text Service Button"
