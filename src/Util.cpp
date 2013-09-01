@@ -5,8 +5,12 @@
 #include <memory>
 #include <iterator>
 #include <Windows.h>
+
+#if _WIN32_WINNT >= 0x0602
 #include <Stringapiset.h> // Windows 8
-// #include <Winnls.h> // Before Windows 8
+#else
+#include <Winnls.h> // Before Windows 8
+#endif
 
 #include "chewing.h"
 
